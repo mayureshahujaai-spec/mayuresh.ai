@@ -12,7 +12,12 @@ const requestedGuideId = (params.get("id") || "")
   .trim()
   .toLowerCase();
 
-const sourceReel = (params.get("reel") || "").trim();
+// ?reel=xyz ho to wo, warna utm_source (jaise chatgpt.com) save hoga
+const sourceReel = (
+  params.get("reel") ||
+  params.get("utm_source") ||
+  ""
+).trim();
 
 const titleEl = document.getElementById("guideTitle");
 const descriptionEl = document.getElementById("guideDescription");
@@ -73,8 +78,8 @@ if (formTitleEl) {
 // TERMS CHECKBOX
 // =========================================================
 
-// Add a required Terms checkbox if guide.html does not
-// already contain one with id="termsConsent".
+// Agar guide.html mein id="termsConsent" wala checkbox nahi hai,
+// to ye automatically ek required checkbox add kar deta hai.
 
 function ensureTermsCheckbox() {
   if (!form) return null;
@@ -136,7 +141,7 @@ const termsCheckbox = ensureTermsCheckbox();
 
 
 // =========================================================
-// LOAD GUIDE FROM APPS SCRIPT
+// LOAD GUIDE FROM APPS SCRIPT (JSONP)
 // =========================================================
 
 loadGuide()
@@ -150,9 +155,7 @@ loadGuide()
 
     if (titleEl) {
       titleEl.textContent = "";
-      titleEl.appendChild(
-        document.createTextNode("Get your ")
-      );
+      titleEl.appendChild(document.createTextNode("Get your "));
 
       const emphasis = document.createElement("em");
       emphasis.textContent = guide.title;
@@ -371,36 +374,46 @@ if (form) {
     showStatus("Submitting your details...", "info");
 
     try {
-      /*
-       * IMPORTANT:
-       * no-cors mode does not expose the server's response.
-       * Therefore this request cannot reliably confirm that
-       * Apps Script saved the lead.
-       *
-       * The backend submission mechanism must be updated
-       * before this page can safely reveal the download link
-       * only after a verified successful save.
-       */
-
-      await fetch(APPS_SCRIPT_URL, {
+      // no-cors NAHI use karte, taaki server ka jawab padh sakein
+      const response = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
+        redirect: "follow",
         headers: {
           "Content-Type": "text/plain;charset=utf-8"
         },
         body: JSON.stringify(payload)
       });
 
-      showError(
-        "Your request was sent, but we could not verify that " +
-        "your details were saved. Please try again later."
-      );
+      const rawText = await response.text();
 
-      /*
-       * Do not display the download button here.
-       * A successful fetch in no-cors mode is not proof
-       * that the lead was saved.
-       */
+      let result;
+
+      try {
+        result = JSON.parse(rawText);
+      } catch (parseError) {
+        console.error("Unexpected server response:", rawText);
+        showError("Unexpected server response. Please try again.");
+        return;
+      }
+
+      if (!result || result.success !== true) {
+        showError(
+          (result && result.message) ||
+          "We could not save your details. Please try again."
+        );
+        return;
+      }
+
+      // Lead save ho chuki hai, ab download dikhao
+      const pdfUrl =
+        (result.guide && result.guide.pdfUrl) || guide.pdfUrl;
+
+      if (!pdfUrl) {
+        showError("The guide file is unavailable right now.");
+        return;
+      }
+
+      showDownload(pdfUrl);
 
     } catch (error) {
       console.error("Lead submission error:", error);
@@ -415,6 +428,51 @@ if (form) {
       setSubmitting(false);
     }
   });
+}
+
+
+// =========================================================
+// DOWNLOAD REVEAL
+// =========================================================
+
+function showDownload(pdfUrl) {
+  clearStatus();
+
+  if (form) {
+    form.hidden = true;
+  }
+
+  if (downloadArea) {
+    downloadArea.hidden = false;
+  }
+
+  if (downloadMessage) {
+    downloadMessage.textContent =
+      "Thank you! Your guide is ready. " +
+      "Click the button below to download it.";
+  }
+
+  if (downloadBtn) {
+    downloadBtn.hidden = false;
+
+    if (downloadBtn.tagName === "A") {
+      downloadBtn.href = pdfUrl;
+      downloadBtn.target = "_blank";
+      downloadBtn.rel = "noopener noreferrer";
+    } else {
+      downloadBtn.onclick = function() {
+        window.open(pdfUrl, "_blank", "noopener");
+      };
+    }
+
+    downloadBtn.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  } else {
+    // Page par download button hi na ho to seedha khol do
+    window.open(pdfUrl, "_blank", "noopener");
+  }
 }
 
 
@@ -451,17 +509,4 @@ function showStatus(message, type) {
 
   statusEl.className = "form-status " + type;
   statusEl.textContent = message;
-}
-
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, function(char) {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[char];
-  });
 }
