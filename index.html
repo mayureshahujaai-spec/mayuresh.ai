@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A practical guide to AI tools, news and resources.">
+<meta name="theme-color" content="#080d1b">
+<title>AI Insider — AI Tools, News & Resources</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#080d1b;color:#f5f7ff;font:16px/1.65 Arial,sans-serif}a{color:#82e8ff;text-decoration:none}.wrap{width:min(960px,90%);margin:auto}.nav{padding:24px 0;border-bottom:1px solid #26334d;font-weight:bold;letter-spacing:1px}.hero{padding:65px 0}.tag{color:#82e8ff;font-size:12px;letter-spacing:2px;font-weight:bold}h1{font-size:clamp(42px,8vw,76px);line-height:1.08;margin:18px 0}h2{font-size:28px}.muted{color:#aebbd2;max-width:620px}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{padding:24px;background:#111a2c;border:1px solid #26334d;border-radius:16px}.pill{font-size:10px;color:#aebbd2;letter-spacing:1px}.button{display:inline-block;background:#82e8ff;color:#08111f;padding:10px 15px;border-radius:8px;font-weight:bold;margin-top:8px}.cta{margin:40px 0;padding:25px;border:1px solid #334461;border-radius:16px;background:#111a2c}footer{padding:25px 0;border-top:1px solid #26334d;color:#aebbd2;font-size:12px}@media(max-width:620px){.cards{grid-template-columns:1fr}.hero{padding:45px 0}}
+</style></head>
+<body>
+<nav class="wrap nav">✦ AI INSIDER</nav>
+<main class="wrap">
+<section class="hero"><div class="tag">YOUR AI UPDATE STARTS HERE</div><h1>Make AI work<br><span style="color:#82e8ff">for you.</span></h1><p class="muted">Useful AI tools. Important updates. Practical resources. Everything you need to stay ahead—without the noise.</p><a class="button" href="#resources">Explore the guide ↓</a></section>
+<h2 id="resources">Start exploring.</h2>
+<section class="cards">
+<article class="card"><div class="pill">START HERE</div><h2>Discover AI tools</h2><p class="muted">Tools for writing, research, design and productivity.</p><a class="button" href="https://www.futuretools.io/" target="_blank" rel="noopener noreferrer">Explore tool directory ↗</a></article>
+<article class="card"><div class="pill">OFFICIAL SOURCE</div><h2>OpenAI updates</h2><p class="muted">Official announcements, product news and research.</p><a class="button" href="https://openai.com/news/" target="_blank" rel="noopener noreferrer">Read updates ↗</a></article>
+<article class="card"><div class="pill">AI RESEARCH</div><h2>Google AI news</h2><p class="muted">Updates from Google AI and research teams.</p><a class="button" href="https://blog.google/technology/ai/" target="_blank" rel="noopener noreferrer">Explore Google AI ↗</a></article>
+<article class="card"><div class="pill">LEARN</div><h2>Learn AI practically</h2><p class="muted">Beginner-friendly courses and tutorials.</p><a class="button" href="https://www.deeplearning.ai/short-courses/" target="_blank" rel="noopener noreferrer">Browse courses ↗</a></article>
+</section>
+<section class="cta"><div class="tag">KEEP THIS HANDY</div><h2>Your next AI discovery starts here.</h2><p class="muted">Save this page and return whenever you want to explore something new.</p><button id="share" class="button" type="button" style="border:0;cursor:pointer">Share this guide ↗</button></section>
+</main>
+<footer class="wrap">AI Insider · Independent resource guide. Check official sources for the latest details.</footer>
+<script>document.getElementById('share').addEventListener('click',async()=>{try{if(navigator.share){await navigator.share({title:document.title,url:location.href})}else{await navigator.clipboard.writeText(location.href);document.getElementById('share').textContent='Link copied ✓'}}catch(e){}});</script>
+</body></html>
